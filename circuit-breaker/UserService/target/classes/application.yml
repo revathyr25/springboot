@@ -1,0 +1,63 @@
+server:
+  port: 8081
+  #disbale as client
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#  instance:
+#    prefer-ip-address: true
+#    client:
+#      serverUrl:
+#        defaultZone: http://localhost:8761/eureka/
+spring:
+  application:
+    name: USER-SERVICE
+  datasource:
+    url: jdbc:mysql://localhost:3306/apigateway
+    username: root
+    password: Harry@2020
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+
+management:
+  health:
+    circuit-breakers:
+      enable: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuit-breaker:
+    instances:
+      hotelBreaker:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 6s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+
+  retry:
+    instances:
+      hotelService:
+        max-attempts: 3
+        wait-duration: 5s
+
+  rate-limiter:
+    instances:
+      userRateLimiter:
+        limit-refresh-period: 4s
+        limit-for-period: 2
+        timeout-duration: 0s
